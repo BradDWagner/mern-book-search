@@ -5,23 +5,22 @@ import { REMOVE_BOOK } from '../utils/mutations';
 import { GET_ME } from '../utils/queries'
 import { useQuery, useMutation } from '@apollo/client';
 
-import { getMe, deleteBook } from '../utils/API';
+import { deleteBook } from '../utils/API';
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
 
-
-
-  // const [removeBook, { data, loading, error}] = useMutation(REMOVE_BOOK);
-
+  // const [userData, setUserData] = useState();
   const { loading, data } = useQuery(GET_ME);
-  const user = data?.me || {}
-  const [userData, setUserData] = useState({...user});
-  console.log(user)
+  const [removeBook, {error }] = useMutation(REMOVE_BOOK)
+  let userData = data?.me || {}
+  // setUserData(data)
 
-    // use this to determine if `useEffect()` hook needs to run again
-    const userDataLength = Object.keys(userData).length;
+
+
+  // use this to determine if `useEffect()` hook needs to run again
+  const userDataLength = Object.keys(userData).length;
  
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
@@ -32,15 +31,21 @@ const SavedBooks = () => {
       return false;
     }
 
+    console.log("bookId is " + bookId)
     try {
-      const response = await deleteBook(bookId, token);
+      const { data } = await removeBook({
+        variables: {
+          bookId: bookId
+        }
+      })
 
-      if (!response.ok) {
+      if (!data) {
         throw new Error('something went wrong!');
       }
+      console.log(data.removeBook);
+      userData = data?.removeBook
 
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
+      // setUserData(updatedUser);
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
@@ -49,9 +54,9 @@ const SavedBooks = () => {
   };
 
   // if data isn't here yet, say so
-  if (!userDataLength) {
-    return <h2>LOADING...</h2>;
-  }
+  // if (!userDataLength) {
+  //   return <h2>LOADING.....</h2>;
+  // }
 
   return (
     <>
