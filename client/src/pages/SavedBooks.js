@@ -11,17 +11,17 @@ import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
 
-  // const [userData, setUserData] = useState();
+  // const { loading, data } = useQuery(GET_ME);
+  // const myData = data?.me
+  // const [removeBook, {error }] = useMutation(REMOVE_BOOK)
+
+  // const [userData, setUserData] = useState({});
+
+  // setUserData(myData)
+
   const { loading, data } = useQuery(GET_ME);
+  let userData = data?.me
   const [removeBook, {error }] = useMutation(REMOVE_BOOK)
-  let userData = data?.me || {}
-  // setUserData(data)
-
-
-
-  // use this to determine if `useEffect()` hook needs to run again
-  const userDataLength = Object.keys(userData).length;
- 
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
@@ -43,9 +43,10 @@ const SavedBooks = () => {
         throw new Error('something went wrong!');
       }
       console.log(data.removeBook);
-      userData = data?.removeBook
-
+      userData = data.removeBook
+      // const updatedUser = data?.removeBook
       // setUserData(updatedUser);
+
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
@@ -53,10 +54,10 @@ const SavedBooks = () => {
     }
   };
 
-  // if data isn't here yet, say so
-  // if (!userDataLength) {
-  //   return <h2>LOADING.....</h2>;
-  // }
+  if (loading) {
+    return((<h2>LOADING...</h2>) )
+  } 
+
 
   return (
     <>
@@ -65,7 +66,6 @@ const SavedBooks = () => {
           <h1>Viewing saved books!</h1>
         </Container>
       </Jumbotron>
-      {loading ? (<h2>LOADING...</h2>) : (
         <Container>
         <h2>
           {userData.savedBooks.length
@@ -90,7 +90,6 @@ const SavedBooks = () => {
           })}
         </CardColumns>
       </Container>
-      )}
       
     </>
   );
