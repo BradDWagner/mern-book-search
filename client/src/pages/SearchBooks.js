@@ -4,6 +4,7 @@ import { Jumbotron, Container, Col, Form, Button, Card, CardColumns } from 'reac
 import Auth from '../utils/auth';
 import { searchGoogleBooks } from '../utils/API';
 import { SAVE_BOOK } from '../utils/mutations';
+import { GET_ME } from '../utils/queries';
 import { useMutation } from '@apollo/client';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
@@ -16,7 +17,18 @@ const SearchBooks = () => {
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
-  const [saveBook, { data, loading, error }] = useMutation(SAVE_BOOK);
+  const [saveBook, { data, loading, error }] = useMutation(SAVE_BOOK, {
+    update(cache, {data: { saveBook } }) {
+      try {
+        cache.writeQuery({
+          query: GET_ME,
+          data: { me: saveBook },
+        })
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  });
 
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
   // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup

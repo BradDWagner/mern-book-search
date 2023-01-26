@@ -10,14 +10,6 @@ import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
 
-  // const { loading, data } = useQuery(GET_ME);
-  // const myData = data?.me
-  // const [removeBook, {error }] = useMutation(REMOVE_BOOK)
-
-  // const [userData, setUserData] = useState({});
-
-  // setUserData(myData)
-
   const [removeBook, {error }] = useMutation(REMOVE_BOOK, {
     update(cache, {data: { removeBook } }) {
       try {
@@ -53,8 +45,6 @@ const SavedBooks = () => {
         throw new Error('something went wrong!');
       }
       userData = data.removeBook
-      // const updatedUser = data?.removeBook
-      // setUserData(updatedUser);
 
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
@@ -67,7 +57,6 @@ const SavedBooks = () => {
   if (loading || !userData.savedBooks.length) {
     return((<h2>LOADING...</h2>) )
   } 
-
 
   return (
     <>
